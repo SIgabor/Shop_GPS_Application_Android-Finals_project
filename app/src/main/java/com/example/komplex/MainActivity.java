@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openActivity2();
+                openActivity3();
             }
         });
 
@@ -42,11 +42,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void openActivity2() {
+    /*private void openActivity2() {
         Intent intent = new Intent(this, MainActivity2.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_from_rigth, R.anim.slide_to_left);
-    }
+    }*/
 
     private void openActivity3() {
         Intent intent = new Intent(this, MainActivity3.class);

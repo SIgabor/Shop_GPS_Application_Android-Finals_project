@@ -4,11 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +58,15 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
 
     @Override
     public void onBackPressed(){
+
+        Intent senderIntent = new Intent(this, MainActivity2.class);
+        Bundle args = new Bundle();
+        args.putSerializable("BAG_ITEMS", (Serializable) bagItems);
+        senderIntent.putExtra("BUNDLE", args);
+        startActivity(senderIntent);
+
+        Log.d("MyTag", "onCreate: Intent sent");
+
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top);
     }
