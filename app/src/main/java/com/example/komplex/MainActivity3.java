@@ -81,6 +81,5 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
             bagItems.remove(item);
         }
         tv_bag.setText(String.valueOf(bagItems.size()));
-        Toast.makeText(this, item.isChecked(), Toast.LENGTH_SHORT).show();
     }
 }
