@@ -41,9 +41,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             @Override
             public void onClick(View view) {
                 listener.onItemClicked(items.get(holder.getAdapterPosition()));
-
+                notifyDataSetChanged();
             }
         });
+
 
 
     }

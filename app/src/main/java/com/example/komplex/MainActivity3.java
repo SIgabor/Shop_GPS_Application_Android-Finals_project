@@ -84,5 +84,6 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         }
         tv_bag.setText(String.valueOf(bagItems.size()));
 
+
     }
 }
