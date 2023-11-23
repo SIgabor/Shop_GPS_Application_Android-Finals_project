@@ -32,6 +32,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        Collections.sort(items, new AbcComparator());
         Collections.sort(items, new CustomComparator().reversed());
         holder.nameView.setText(items.get(position).getName());
         holder.priceView.setText(items.get(position).getPrice());
@@ -60,4 +61,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             return Boolean.compare(o1.getChecked(), o2.getChecked());
         }
     }
+
+    public class AbcComparator implements Comparator<Item> {
+        @Override
+        public int compare(Item o1, Item o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
+
+
 }
