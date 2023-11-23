@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity3 extends AppCompatActivity implements SelectListener{
@@ -81,5 +83,6 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
             bagItems.remove(item);
         }
         tv_bag.setText(String.valueOf(bagItems.size()));
+
     }
 }

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
@@ -30,6 +32,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        Collections.sort(items, new CustomComparator().reversed());
         holder.nameView.setText(items.get(position).getName());
         holder.priceView.setText(items.get(position).getPrice());
         holder.imageview.setImageResource(items.get(position).getImage());
@@ -38,6 +41,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             @Override
             public void onClick(View view) {
                 listener.onItemClicked(items.get(holder.getAdapterPosition()));
+
             }
         });
 
@@ -47,5 +51,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public class CustomComparator implements Comparator<Item> {
+        @Override
+        public int compare(Item o1, Item o2) {
+            return Boolean.compare(o1.getChecked(), o2.getChecked());
+        }
     }
 }
