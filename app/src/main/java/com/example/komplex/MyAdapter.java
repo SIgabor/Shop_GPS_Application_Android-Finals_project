@@ -1,6 +1,7 @@
 package com.example.komplex;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     private Context context;
     private List<Item> items;
     private SelectListener listener;
+    private Color color;
 
     public MyAdapter(Context context, List<Item> items, SelectListener listener) {
         this.context = context;
@@ -38,10 +40,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         holder.priceView.setText(items.get(position).getPrice());
         holder.imageview.setImageResource(items.get(position).getImage());
 
+        //TODO: indexelési bug van a recycler viewban kijejölés terén.
+
+        if(items.get(position).getChecked()){
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#b5f5d1"));
+        }
+
+
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onItemClicked(items.get(holder.getAdapterPosition()));
+
                 notifyDataSetChanged();
             }
         });
