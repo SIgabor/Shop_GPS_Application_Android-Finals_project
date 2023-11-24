@@ -40,12 +40,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         holder.priceView.setText(items.get(position).getPrice());
         holder.imageview.setImageResource(items.get(position).getImage());
 
-        //TODO: indexelési bug van a recycler viewban kijejölés terén.
-
         if(items.get(position).getChecked()){
             holder.cardView.setCardBackgroundColor(Color.parseColor("#b5f5d1"));
+        }else{
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#ffffff"));
         }
-
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
