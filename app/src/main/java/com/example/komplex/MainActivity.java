@@ -14,7 +14,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Button button;
-    private Button btn_search;
 
 
 
@@ -31,13 +30,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_search = findViewById(R.id.btn_search);
-        btn_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openActivity3();
-            }
-        });
+
 
 
     }

@@ -48,7 +48,6 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         });
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setAdapter(myAdapter);
         bagItems = new ArrayList<>();
         tv_bag= findViewById(R.id.tv_bag);
 
@@ -85,7 +84,6 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
                 Log.d("MyTag", "item added");
             }
         }
-
         if(filteredList.isEmpty()){
             Toast.makeText(this, "Nincs ilyen termék!", Toast.LENGTH_SHORT).show();
         }else{
@@ -115,7 +113,7 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         item.setChecked(!item.getChecked());
         if(item.getChecked()){
             bagItems.add(item);
-        } else if (!item.getChecked()) {
+        } else {
             bagItems.remove(item);
         }
         tv_bag.setText(String.valueOf(bagItems.size()));
