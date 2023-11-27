@@ -27,8 +27,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
-        List<Item> bagItems = new ArrayList<Item>();
-        bagItems = (ArrayList<Item>) args.getSerializable("BAG_ITEMS");
+        List<Item> bagItems = (ArrayList<Item>) args.getSerializable("BAG_ITEMS");
         Log.d("MyTag", "Intent received");
 
         for(int i = 0; i < bagItems.size(); i++){
