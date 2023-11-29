@@ -14,7 +14,10 @@
         android:layout_height="50dp"
         android:layout_marginStart="18dp"
         android:layout_marginTop="8dp"
+        android:theme="@style/SearchViewBlack"
+        android:searchIcon="@drawable/baseline_search_24"
         android:background="@drawable/custom_search_view"
+        android:queryHint="Keresés..."
         android:iconifiedByDefault="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -47,7 +50,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="8dp"
             android:clipToPadding="false"
             app:layout_constraintBottom_toBottomOf="@id/consLayout"
