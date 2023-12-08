@@ -2,6 +2,7 @@ package com.example.komplex;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -11,8 +12,11 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,13 +36,19 @@ public class MainActivity2 extends AppCompatActivity {
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
-    TextView textView;
-    TextView tv_lat, tv_lon;
-    Switch sw_gps;
-    String str;
-    LocationRequest locationRequest;
-    LocationCallback locationCallBack;
-    FusedLocationProviderClient fusedLocationProviderClient;
+    private static TextView textView;
+    private static TextView tv_lat, tv_lon;
+    private static TextView tv_center;
+    private static Switch sw_gps;
+    private static String str;
+    private static LocationRequest locationRequest;
+    private static LocationCallback locationCallBack;
+    private static FusedLocationProviderClient fusedLocationProviderClient;
+    private static int defaultX;
+    private static int defaultY;
+    private static ConstraintLayout constraintLayout;
+    private static Button btn_move;
+    private static ImageView grid_map;
 
 
 
@@ -47,6 +57,22 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        defaultY = displayMetrics.heightPixels / 2;
+        defaultX = displayMetrics.widthPixels / 2;
+
+        btn_move = findViewById(R.id.btn_move);
+        grid_map = findViewById(R.id.grid_map);
+        btn_move.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grid_map.setY(grid_map.getY() - 50);
+            }
+        });
+
 
         tv_lat = findViewById(R.id.tv_lat);
         tv_lon = findViewById(R.id.tv_lon);
