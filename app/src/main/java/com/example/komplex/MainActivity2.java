@@ -2,7 +2,6 @@ package com.example.komplex;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -14,10 +13,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,19 +32,21 @@ public class MainActivity2 extends AppCompatActivity {
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
+    public static final int GPS_PRECISION = 100000;
     private static TextView textView;
-    private static TextView tv_lat, tv_lon;
-    private static TextView tv_center;
-    private static Switch sw_gps;
+    private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX;
     private static String str;
     private static LocationRequest locationRequest;
     private static LocationCallback locationCallBack;
     private static FusedLocationProviderClient fusedLocationProviderClient;
-    private static int defaultX;
-    private static int defaultY;
-    private static ConstraintLayout constraintLayout;
-    private static Button btn_move;
+    private static double defaultX = 0;
+    private static double defaultY = 0;
+    private static double currentX;
+    private static double currentY;
+    private static double deltaX;
+    private static double deltaY;
     private static ImageView grid_map;
+    private static ImageView locationMarker;
 
 
 
@@ -61,28 +59,23 @@ public class MainActivity2 extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        defaultY = displayMetrics.heightPixels / 2;
-        defaultX = displayMetrics.widthPixels / 2;
 
-        btn_move = findViewById(R.id.btn_move);
+
+
         grid_map = findViewById(R.id.grid_map);
-        btn_move.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                grid_map.setY(grid_map.getY() - 50);
-            }
-        });
+        locationMarker = findViewById(R.id.locationMarker);
+        tv_deltaY = findViewById(R.id.tv_deltaY);
+        tv_deltaX = findViewById(R.id.tv_deltaX);
 
 
         tv_lat = findViewById(R.id.tv_lat);
         tv_lon = findViewById(R.id.tv_lon);
-        sw_gps = findViewById(R.id.sw_gps);
         textView =  findViewById(R.id.tv_baggedItems);
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(1000 * FAST_UPDATE_INTERVAL);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationCallBack = new LocationCallback() {
 
             @Override
@@ -91,23 +84,6 @@ public class MainActivity2 extends AppCompatActivity {
                 updateUIValues(locationResult.getLastLocation());
             }
         };
-
-        sw_gps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(sw_gps.isChecked()){
-                    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    Log.d("MyTag", "Using GPS");
-                    sw_gps.setText("GPS");
-                }else{
-                    locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                    Log.d("MyTag", "Using WIFI + towers");
-                    sw_gps.setText("WIFI + towers");
-                }
-            }
-        });
-
-
 
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
@@ -174,8 +150,35 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void updateUIValues(Location location) {
-        tv_lat.setText(String.valueOf(location.getLatitude()));
-        tv_lon.setText(String.valueOf(location.getLongitude()));
+        tv_lat.setText(String.valueOf(location.getLatitude()));// = y
+        tv_lon.setText(String.valueOf(location.getLongitude()));// = x
+
+        if(defaultX  == 0 && defaultY == 0){
+            defaultX = -(int)Math.round(location.getLongitude() * GPS_PRECISION);
+            defaultY = -(int)Math.round(location.getLatitude() * GPS_PRECISION);
+        }
+
+        currentX = -(int)Math.round(location.getLongitude() * GPS_PRECISION);
+        currentY = -(int)Math.round(location.getLatitude() * GPS_PRECISION);
+
+        deltaX = -(defaultX - currentX);
+        deltaY = -(defaultY - currentY);
+
+        changePosition(grid_map, deltaX, deltaY);
+        changePosition(locationMarker, deltaX, deltaY);
+
+        defaultX = currentX;
+        defaultY = currentY;
+        tv_deltaY.setText(String.valueOf(deltaY));
+        tv_deltaX.setText(String.valueOf(deltaX));
+
+
+
+    }
+
+    public static void changePosition(ImageView imageView, double deltaX, double deltaY){
+        imageView.setX(imageView.getX() + (int)Math.round(deltaX));
+        imageView.setY(imageView.getY() - (int)Math.round(deltaY));
     }
 
     @Override
