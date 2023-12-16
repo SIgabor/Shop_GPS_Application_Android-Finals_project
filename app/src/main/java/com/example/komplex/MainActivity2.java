@@ -7,6 +7,10 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,18 +31,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity2 extends AppCompatActivity {
+public class MainActivity2 extends AppCompatActivity implements SensorEventListener {
 
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
     public static final int GPS_PRECISION = 100000;
     private static TextView textView;
-    private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX;
+    private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX, tv_heading;
     private static String str;
     private static LocationRequest locationRequest;
     private static LocationCallback locationCallBack;
     private static FusedLocationProviderClient fusedLocationProviderClient;
+    private static SensorManager sensorManager;
     private static double defaultX = 0;
     private static double defaultY = 0;
     private static double currentX;
@@ -47,6 +52,9 @@ public class MainActivity2 extends AppCompatActivity {
     private static double deltaY;
     private static ImageView grid_map;
     private static ImageView locationMarker;
+    private static ImageView arrowToNorth;
+
+    private static int degree;
 
 
 
@@ -66,6 +74,7 @@ public class MainActivity2 extends AppCompatActivity {
         locationMarker = findViewById(R.id.locationMarker);
         tv_deltaY = findViewById(R.id.tv_deltaY);
         tv_deltaX = findViewById(R.id.tv_deltaX);
+        tv_heading = findViewById(R.id.tv_heading);
 
 
         tv_lat = findViewById(R.id.tv_lat);
@@ -84,6 +93,9 @@ public class MainActivity2 extends AppCompatActivity {
                 updateUIValues(locationResult.getLastLocation());
             }
         };
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        arrowToNorth = findViewById(R.id.iv_arrowToNorth);
 
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
@@ -174,6 +186,7 @@ public class MainActivity2 extends AppCompatActivity {
 
 
 
+
     }
 
     public static void changePosition(ImageView imageView, double deltaX, double deltaY){
@@ -185,5 +198,29 @@ public class MainActivity2 extends AppCompatActivity {
     public void onBackPressed(){
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_rigth);
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        degree = Math.round(sensorEvent.values[0]);
+        tv_heading.setText("Heading: " + degree);
+        arrowToNorth.setRotation(-degree);
+        //TODO: kitalálni valamit a kép forgatására, mivel annaka középpontja mindig máshol lesz
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 }
