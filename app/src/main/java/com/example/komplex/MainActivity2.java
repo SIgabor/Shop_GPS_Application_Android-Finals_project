@@ -7,6 +7,8 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,6 +19,8 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +60,14 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static ImageView currentPosition;
 
     private static int degree;
+    private static Bitmap largeBitmap;
+    private static int screenWidth;
+    private static int screenHeight;
+    private static int visibleWidth;
+    private static int visibleHeight;
+    private static int xOffset;
+    private static int yOffset;
+    private static Button btn_move;
 
 
 
@@ -76,6 +88,19 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         tv_deltaY = findViewById(R.id.tv_deltaY);
         tv_deltaX = findViewById(R.id.tv_deltaX);
         tv_heading = findViewById(R.id.tv_heading);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;// Adjust the sample size as needed
+        largeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+
+// Calculate visible portion based on screen dimensions and position
+        screenWidth = getResources().getDisplayMetrics().widthPixels;
+        screenHeight = getResources().getDisplayMetrics().heightPixels;
+        visibleWidth = screenWidth;  // Adjust as needed
+        visibleHeight = screenHeight;// Adjust as needed
+        xOffset = 0; // Adjust based on current screen position
+        yOffset = 0; // Adjust based on current screen position
+        btn_move = findViewById(R.id.btn_move);
 
 
         tv_lat = findViewById(R.id.tv_lat);
@@ -115,6 +140,13 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         updateGPS();
         startLocationUpdates();
 
+        btn_move.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                xOffset+=200;
+                Log.d("MyTag", "gomb");
+            }
+        });
 
     }
 
@@ -178,13 +210,29 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         deltaX = -(defaultX - currentX);
         deltaY = -(defaultY - currentY);
 
-        changePosition(grid_map, deltaX, deltaY);
-        changePosition(locationMarker, deltaX, deltaY);
+        //changePosition(grid_map, deltaX, deltaY);
+        //changePosition(locationMarker, deltaX, deltaY);
 
         defaultX = currentX;
         defaultY = currentY;
         tv_deltaY.setText(String.valueOf(deltaY));
         tv_deltaX.setText(String.valueOf(deltaX));
+
+        try {
+            xOffset = (int)Math.round(deltaX);
+            yOffset = (int)Math.round(deltaY);
+
+            Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);
+            Log.d("MyTag", "OK");
+// Set the cropped bitmap to the ImageView
+            grid_map.setImageBitmap(visibleBitmap);// Your code here
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("MyTag", "catched");// Log the exception
+        }
+
+
+
 
 
 
@@ -218,7 +266,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         degree = Math.round(sensorEvent.values[0]);
         tv_heading.setText("Heading: " + degree);
         arrowToNorth.setRotation(-degree);
-        currentPosition.setRotation(-degree);
+        //currentPosition.setRotation(degree);
         //TODO: kitalálni valamit a kép forgatására, mivel annaka középpontja mindig máshol lesz
     }
 
