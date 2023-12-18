@@ -53,6 +53,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static ImageView grid_map;
     private static ImageView locationMarker;
     private static ImageView arrowToNorth;
+    private static ImageView currentPosition;
 
     private static int degree;
 
@@ -96,6 +97,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         arrowToNorth = findViewById(R.id.iv_arrowToNorth);
+        currentPosition = findViewById(R.id.iv_currentPosition);
 
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
@@ -216,6 +218,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         degree = Math.round(sensorEvent.values[0]);
         tv_heading.setText("Heading: " + degree);
         arrowToNorth.setRotation(-degree);
+        currentPosition.setRotation(-degree);
         //TODO: kitalálni valamit a kép forgatására, mivel annaka középpontja mindig máshol lesz
     }
 
