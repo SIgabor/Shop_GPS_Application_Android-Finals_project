@@ -40,7 +40,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
-    public static final int GPS_PRECISION = 100000;
+    public static final int GPS_PRECISION = 1000000/2;
     private static TextView textView;
     private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX, tv_heading;
     private static String str;
@@ -90,16 +90,19 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         tv_heading = findViewById(R.id.tv_heading);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
+        Log.d("MyTag", "ok 1");
         options.inSampleSize = 3;// Adjust the sample size as needed
+        Log.d("MyTag", "ok 2");
         largeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        Log.d("MyTag", "ok 3");
 
 // Calculate visible portion based on screen dimensions and position
         screenWidth = getResources().getDisplayMetrics().widthPixels;
         screenHeight = getResources().getDisplayMetrics().heightPixels;
         visibleWidth = screenWidth;  // Adjust as needed
         visibleHeight = screenHeight;// Adjust as needed
-        xOffset = 0; // Adjust based on current screen position
-        yOffset = 0; // Adjust based on current screen position
+        xOffset = largeBitmap.getWidth() / 2; // Adjust based on current screen position
+        yOffset = largeBitmap.getHeight() / 2; // Adjust based on current screen position
         btn_move = findViewById(R.id.btn_move);
 
 
@@ -143,7 +146,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         btn_move.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xOffset+=200;
+                deltaY = -20;
                 Log.d("MyTag", "gomb");
             }
         });
@@ -207,7 +210,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         currentX = -(int)Math.round(location.getLongitude() * GPS_PRECISION);
         currentY = -(int)Math.round(location.getLatitude() * GPS_PRECISION);
 
-        deltaX = -(defaultX - currentX);
+        deltaX = (defaultX - currentX);
         deltaY = -(defaultY - currentY);
 
         //changePosition(grid_map, deltaX, deltaY);
@@ -219,13 +222,14 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         tv_deltaX.setText(String.valueOf(deltaX));
 
         try {
-            xOffset = (int)Math.round(deltaX);
-            yOffset = (int)Math.round(deltaY);
-
-            Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);
-            Log.d("MyTag", "OK");
-// Set the cropped bitmap to the ImageView
+            xOffset +=(int)Math.round(deltaX);
+            yOffset +=(int)Math.round(deltaY);
+            Log.d("MyTag", String.valueOf(yOffset));
+            Log.d("MyTag", String.valueOf(largeBitmap.getHeight()));
+            Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);// Set the cropped bitmap to the ImageView
             grid_map.setImageBitmap(visibleBitmap);// Your code here
+
+            Log.d("MyTag", "OK");
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("MyTag", "catched");// Log the exception
