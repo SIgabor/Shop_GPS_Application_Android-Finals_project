@@ -5,10 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -39,7 +43,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
-    private static final int PERMISSIONS_FINE_LOCATION = 99;
+    private static final int PERMISSIONS_FINE_LOCATION = 99; //!!!DO NOT CHANGE!!!
     public static final int GPS_PRECISION = 1000000/2;
     private static TextView textView;
     private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX, tv_heading;
@@ -58,7 +62,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static ImageView locationMarker;
     private static ImageView arrowToNorth;
     private static ImageView currentPosition;
-
     private static int degree;
     private static Bitmap largeBitmap;
     private static int screenWidth;
@@ -93,8 +96,11 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Log.d("MyTag", "ok 1");
         options.inSampleSize = 3;// Adjust the sample size as needed
         Log.d("MyTag", "ok 2");
-        largeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        Bitmap helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2);
         Log.d("MyTag", "ok 3");
+
 
 // Calculate visible portion based on screen dimensions and position
         screenWidth = getResources().getDisplayMetrics().widthPixels;
@@ -102,7 +108,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         visibleWidth = screenWidth;  // Adjust as needed
         visibleHeight = screenHeight;// Adjust as needed
         xOffset = largeBitmap.getWidth() / 2; // Adjust based on current screen position
-        yOffset = largeBitmap.getHeight() / 2; // Adjust based on current screen position
+        yOffset = largeBitmap.getHeight() / 2 - 500; // Adjust based on current screen position
         btn_move = findViewById(R.id.btn_move);
 
 
@@ -143,6 +149,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         updateGPS();
         startLocationUpdates();
 
+
+
         btn_move.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -152,6 +160,20 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         });
 
     }
+
+    private void drawCircles(Bitmap bitmap, float centerX, float centerY) {
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+
+        float radius = 100f;
+
+        // Draw the circle on the canvas
+        canvas.drawCircle(centerX, centerY, radius, paint);
+    }
+
+
 
     private void startLocationUpdates() {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
@@ -233,6 +255,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("MyTag", "catched");// Log the exception
+            Toast.makeText(this, "Bolt területe elhagyva!" , Toast.LENGTH_SHORT).show();
         }
 
 
