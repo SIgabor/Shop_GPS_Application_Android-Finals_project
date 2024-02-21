@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -45,6 +44,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99; //!!!DO NOT CHANGE!!!
     public static final int GPS_PRECISION = 1000000/2;
+    public static final int RECT_LR_SIZE = 25;
+    public static final int RECT_TB_SIZE = 125;
     private static TextView textView;
     private static TextView tv_lat, tv_lon, tv_deltaY, tv_deltaX, tv_heading;
     private static String str;
@@ -59,7 +60,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static double deltaX;
     private static double deltaY;
     private static ImageView grid_map;
-    private static ImageView locationMarker;
     private static ImageView arrowToNorth;
     private static ImageView currentPosition;
     private static int degree;
@@ -70,7 +70,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static int visibleHeight;
     private static int xOffset;
     private static int yOffset;
-    private static Button btn_move;
+    private static ArrayList<EndPoint> endPoints;
+
 
 
 
@@ -87,7 +88,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
         grid_map = findViewById(R.id.grid_map);
-        locationMarker = findViewById(R.id.locationMarker);
         tv_deltaY = findViewById(R.id.tv_deltaY);
         tv_deltaX = findViewById(R.id.tv_deltaX);
         tv_heading = findViewById(R.id.tv_heading);
@@ -98,7 +98,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Log.d("MyTag", "ok 2");
         Bitmap helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
         largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2);
         Log.d("MyTag", "ok 3");
 
 
@@ -107,9 +106,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         screenHeight = getResources().getDisplayMetrics().heightPixels;
         visibleWidth = screenWidth;  // Adjust as needed
         visibleHeight = screenHeight;// Adjust as needed
-        xOffset = largeBitmap.getWidth() / 2; // Adjust based on current screen position
-        yOffset = largeBitmap.getHeight() / 2 - 500; // Adjust based on current screen position
-        btn_move = findViewById(R.id.btn_move);
+        xOffset = largeBitmap.getWidth() / 2 - screenWidth / 2; // Adjust based on current screen position
+        yOffset = largeBitmap.getHeight() / 2 - screenHeight / 2; // Adjust based on current screen position
 
 
         tv_lat = findViewById(R.id.tv_lat);
@@ -145,33 +143,87 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             }
         }
 
+        float[] rectOffsetX = {60, 180, 300, 420};
+        float[] rectOffsetY = {170, 510};
+        float[] lineOffsetX = {-360, -240, -120, 0, 120, 240, 360};
+        float[] lineOffsetY = {-680, -340, 0, 340, 680};
+
+
+        for(int i = 0; i < rectOffsetX.length; i++){
+            for(int j = 0; j < rectOffsetY.length; j++){
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
+            }
+        }
+
+        endPoints = new ArrayList();
+
+        for(int i = 0; i < lineOffsetY.length; i++){
+            for(int j = 0; j < lineOffsetX.length; j++){
+                endPoints.add(new EndPoint(lineOffsetX[j], lineOffsetY[i]));
+
+            }
+        }
+
         textView.setText(str);
         updateGPS();
         startLocationUpdates();
+        //drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2 - 800);
+        //drawRectangle(largeBitmap.getWidth()/2 - 60 - 130, largeBitmap.getHeight()/2 - 170 - 280);
+        drawLine(endPoints.get(10), endPoints.get(7));
+        drawLine(endPoints.get(10), endPoints.get(13));
+        drawLine(endPoints.get(14), endPoints.get(20));
+        drawLine(endPoints.get(14), endPoints.get(7));
+        drawLine(endPoints.get(21), endPoints.get(27));
+        drawLine(endPoints.get(20), endPoints.get(27));
 
 
 
-        btn_move.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deltaY = -20;
-                Log.d("MyTag", "gomb");
-            }
-        });
 
+
+
+    }
+
+    private void drawLine(EndPoint startPoint, EndPoint stopPoint){
+        Canvas canvas = new Canvas(largeBitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(20);
+
+        float startX = largeBitmap.getWidth()/2 + startPoint.getX();
+        float startY = largeBitmap.getHeight()/2 + startPoint.getY();
+        float stopX = largeBitmap.getWidth()/2 + stopPoint.getX();
+        float stopY = largeBitmap.getHeight()/2 + stopPoint.getY();
+
+
+        canvas.drawLine(startX, startY, stopX, stopY, paint);
     }
 
     private void drawCircles(Bitmap bitmap, float centerX, float centerY) {
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.FILL);
 
-        float radius = 100f;
+        float radius = 50f;
 
         // Draw the circle on the canvas
         canvas.drawCircle(centerX, centerY, radius, paint);
     }
+
+    private void drawRectangle(float centerX, float centerY){
+        Canvas canvas = new Canvas(largeBitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(centerX - RECT_LR_SIZE,
+                centerY - RECT_TB_SIZE,
+                centerX + RECT_LR_SIZE,
+                centerY + RECT_TB_SIZE, paint);
+    }
+
 
 
 
