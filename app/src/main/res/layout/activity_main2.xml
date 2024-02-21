@@ -65,13 +65,12 @@
 
     <ImageView
         android:id="@+id/grid_map"
-        android:layout_width="900dp"
-        android:layout_height="900dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/grid_map" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/iv_currentPosition"
@@ -82,16 +81,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/locationMarker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/grid_map"
-        app:layout_constraintEnd_toEndOf="@id/grid_map"
-        app:layout_constraintStart_toStartOf="@id/grid_map"
-        app:layout_constraintTop_toTopOf="@id/grid_map"
-        app:srcCompat="@drawable/baseline_location_on_24" />
 
     <TextView
         android:id="@+id/tv_deltaY"
