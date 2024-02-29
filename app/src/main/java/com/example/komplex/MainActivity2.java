@@ -70,7 +70,11 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static int visibleHeight;
     private static int xOffset;
     private static int yOffset;
-    private static ArrayList<EndPoint> endPoints;
+    private static float[] lineOffsetX = { -360, -240, -120, 0, 120, 240, 360 };
+    private static float[] lineOffsetY = { -680, -510, -340, -170, 0, 170, 340, 510, 680 };
+    private static Node[][] nodes;
+    private static ArrayList<Node> neighbours = new ArrayList<>();
+    private static ArrayList<Node> extendedList = new ArrayList<>();
 
 
 
@@ -145,8 +149,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         float[] rectOffsetX = {60, 180, 300, 420};
         float[] rectOffsetY = {170, 510};
-        float[] lineOffsetX = {-360, -240, -120, 0, 120, 240, 360};
-        float[] lineOffsetY = {-680, -340, 0, 340, 680};
 
 
         for(int i = 0; i < rectOffsetX.length; i++){
@@ -158,11 +160,10 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             }
         }
 
-        endPoints = new ArrayList();
-
-        for(int i = 0; i < lineOffsetY.length; i++){
-            for(int j = 0; j < lineOffsetX.length; j++){
-                endPoints.add(new EndPoint(lineOffsetX[j], lineOffsetY[i]));
+        nodes = new Node[lineOffsetX.length][lineOffsetY.length];
+        for (int i = 0; i < lineOffsetY.length; i++) {
+            for (int j = 0; j < lineOffsetX.length; j++) {
+                nodes[j][i] = new Node("" + i + j, lineOffsetX[j], lineOffsetY[i], 0, 0);
 
             }
         }
@@ -172,14 +173,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         startLocationUpdates();
         //drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2 - 800);
         //drawRectangle(largeBitmap.getWidth()/2 - 60 - 130, largeBitmap.getHeight()/2 - 170 - 280);
-        drawLine(endPoints.get(10), endPoints.get(7));
-        drawLine(endPoints.get(10), endPoints.get(13));
-        drawLine(endPoints.get(14), endPoints.get(20));
-        drawLine(endPoints.get(14), endPoints.get(7));
-        drawLine(endPoints.get(21), endPoints.get(27));
-        drawLine(endPoints.get(20), endPoints.get(27));
-        drawLine(endPoints.get(0), endPoints.get(9));
-
+        //drawLine(nodes[0][0], nodes[6][3]);
+        routePlanner(nodes[1][1], nodes[4][3]);
 
 
 
@@ -188,7 +183,93 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
     }
 
-    private void drawLine(EndPoint startPoint, EndPoint stopPoint){
+    public static void routePlanner(Node start, Node goal) {
+        System.out.println("hello");
+
+        Node currentNode = new Node(start.getName(), start.getX(), start.getY(), start.getDistanceTravelled(),
+                start.getHeuristicDistance());
+        Node previousNode = new Node(start.getName(), start.getX(), start.getY(), start.getDistanceTravelled(),
+                start.getHeuristicDistance());
+
+        // set heuristicDistance
+        for (int i = 0; i < lineOffsetY.length; i++) {
+            for (int j = 0; j < lineOffsetX.length; j++) {
+                nodes[j][i].setHeuristicDistance((float) distance(nodes[j][i], goal));
+            }
+        }
+
+        while (!currentNode.getName().equals(goal.getName())) {
+            int[] indexes = getIndex(currentNode);
+
+            // add neighbours
+            if (indexes[0] == 0 && indexes[1] == 0) {
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] == 0) {
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] == lineOffsetY.length - 1) {
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+            } else if (indexes[0] == 0 && indexes[1] == lineOffsetY.length - 1) {
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+            } else if (indexes[1] == 0) {
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] % 2 == 0) {
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+            } else if (indexes[1] == lineOffsetY.length-1) {
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+            } else if (indexes[0] == 0 && indexes[1] % 2 == 0) {
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+            } else if (indexes[1] % 2 != 0) {
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+            } else {
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
+                neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
+                System.out.println("beakadtam");
+            }
+
+            nodeCopy(currentNode, previousNode);
+            extendedList.add(currentNode);
+
+            // set distance travelled
+            for (int i = 0; i < neighbours.size(); i++) {
+                neighbours.get(i).setDistanceTravelled(
+                        currentNode.getDistanceTravelled() + (float) distance(currentNode, neighbours.get(i)));
+            }
+
+
+            // choose best neighbour
+            if (!isExtended(neighbours.get(0))) {
+                nodeCopy(neighbours.get(0), currentNode);
+            }
+            for (int i = 1; i < neighbours.size(); i++) {
+                if (!isExtended(neighbours.get(i)) && (neighbours.get(i).getDistanceTravelled()
+                        + neighbours.get(i).getHeuristicDistance()) < (currentNode.getDistanceTravelled()
+                        + currentNode.getHeuristicDistance())) {
+                    nodeCopy(neighbours.get(i), currentNode);
+                }
+            }
+            drawLine(previousNode, currentNode);
+            //drawCircle(currentNode);
+            neighbours.clear();
+        }
+
+    }
+
+    private static void drawLine(Node startPoint, Node stopPoint){
         Canvas canvas = new Canvas(largeBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.BLUE);
@@ -203,13 +284,15 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         canvas.drawLine(startX, startY, stopX, stopY, paint);
     }
 
-    private void drawCircles(Bitmap bitmap, float centerX, float centerY) {
-        Canvas canvas = new Canvas(bitmap);
+    private static void drawCircle(Node centerPoint) {
+        Canvas canvas = new Canvas(largeBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.FILL);
 
         float radius = 50f;
+        float centerX = largeBitmap.getWidth()/2 + centerPoint.getX();
+        float centerY = largeBitmap.getHeight()/2 + centerPoint.getY();
 
         // Draw the circle on the canvas
         canvas.drawCircle(centerX, centerY, radius, paint);
@@ -318,6 +401,41 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
 
+    }
+
+    public static void nodeCopy(Node from, Node to) {
+        to.setName(from.getName());
+        to.setX(from.getX());
+        to.setY(from.getY());
+        to.setDistanceTravelled(from.getDistanceTravelled());
+        to.setHeuristicDistance(from.getHeuristicDistance());
+    }
+
+    public static boolean isExtended(Node A) {
+        for (int i = 0; i < extendedList.size(); i++) {
+            if (A.getName().equalsIgnoreCase(extendedList.get(i).getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int[] getIndex(Node A) {
+        int[] indexes = new int[2];
+        for (int i = 0; i < lineOffsetY.length; i++) {
+            for (int j = 0; j < lineOffsetX.length; j++) {
+                if (nodes[j][i].getName().equalsIgnoreCase(A.getName())) {
+                    indexes[0] = j;
+                    indexes[1] = i;
+                }
+            }
+        }
+
+        return indexes;
+    }
+
+    public static double distance(Node A, Node B) {
+        return Math.sqrt(Math.pow((B.getX() - A.getX()), 2) + Math.pow((B.getY() - A.getY()), 2));
     }
 
     public static void changePosition(ImageView imageView, double deltaX, double deltaY){
