@@ -178,6 +178,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         drawLine(endPoints.get(14), endPoints.get(7));
         drawLine(endPoints.get(21), endPoints.get(27));
         drawLine(endPoints.get(20), endPoints.get(27));
+        drawLine(endPoints.get(0), endPoints.get(9));
+
 
 
 
@@ -345,8 +347,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         degree = Math.round(sensorEvent.values[0]);
         tv_heading.setText("Heading: " + degree);
         arrowToNorth.setRotation(-degree);
-        //currentPosition.setRotation(degree);
-        //TODO: kitalálni valamit a kép forgatására, mivel annaka középpontja mindig máshol lesz
     }
 
     @Override
