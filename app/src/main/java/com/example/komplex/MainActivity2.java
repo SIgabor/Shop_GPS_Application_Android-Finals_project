@@ -174,7 +174,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         //drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2 - 800);
         //drawRectangle(largeBitmap.getWidth()/2 - 60 - 130, largeBitmap.getHeight()/2 - 170 - 280);
         //drawLine(nodes[0][0], nodes[6][3]);
-        routePlanner(nodes[1][1], nodes[4][3]);
+        routePlanner(nodes[1][1], nodes[6][5]);
 
 
 
