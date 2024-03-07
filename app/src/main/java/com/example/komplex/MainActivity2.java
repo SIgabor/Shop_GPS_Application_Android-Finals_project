@@ -73,6 +73,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static float[] lineOffsetX = { -360, -240, -120, 0, 120, 240, 360 };
     private static float[] lineOffsetY = { -680, -510, -340, -170, 0, 170, 340, 510, 680 };
     private static Node[][] nodes;
+    private static Node currentPositionNode;
     private static ArrayList<Node> neighbours = new ArrayList<>();
     private static ArrayList<Node> extendedList = new ArrayList<>();
 
@@ -135,6 +136,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         arrowToNorth = findViewById(R.id.iv_arrowToNorth);
         currentPosition = findViewById(R.id.iv_currentPosition);
 
+
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
         List<Item> bagItems = (ArrayList<Item>) args.getSerializable("BAG_ITEMS");
@@ -176,11 +178,38 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         //drawLine(nodes[0][0], nodes[6][3]);
         routePlanner(nodes[1][1], nodes[6][5]);
 
+        float currX = currentPosition.getX();
+        float currY = currentPosition.getY();
+        currentPositionNode = new Node("current", currX, currY, 0, 0);
+        drawLine(currentPositionNode, nodes[1][1]);
+        closestNode(nodes[6][5]);
 
 
 
 
 
+    }
+
+    public static Node closestNode(Node goal){
+        Node closestNode =new Node("closest", -screenHeight, -screenWidth,0, 0);
+        ArrayList<Node> neighbours = new ArrayList<>();
+
+        for (int i = 0; i < lineOffsetY.length; i++) {
+            for (int j = 0; j < lineOffsetX.length; j++) {
+                if(distance(currentPositionNode, nodes[j][i]) < 170){
+                    neighbours.add(nodes[j][i]);
+                }
+            }
+        }
+        for(int i = 0; i < neighbours.size(); i++){
+
+            if(distance(neighbours.get(i), goal) < distance(closestNode, goal)){
+                nodeCopy(neighbours.get(i), closestNode);
+
+            }
+        }
+        drawCircle(closestNode);
+        return closestNode;
     }
 
     public static void routePlanner(Node start, Node goal) {
@@ -400,7 +429,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
 
-
     }
 
     public static void nodeCopy(Node from, Node to) {
@@ -465,6 +493,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         degree = Math.round(sensorEvent.values[0]);
         tv_heading.setText("Heading: " + degree);
         arrowToNorth.setRotation(-degree);
+        currentPosition.setRotation(-degree);
     }
 
     @Override
