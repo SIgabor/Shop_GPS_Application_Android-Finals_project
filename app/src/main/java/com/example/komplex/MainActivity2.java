@@ -64,6 +64,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static ImageView currentPosition;
     private static int degree;
     private static Bitmap largeBitmap;
+    private static Bitmap helperBitmap;
     private static int screenWidth;
     private static int screenHeight;
     private static int visibleWidth;
@@ -72,10 +73,13 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static int yOffset;
     private static float[] lineOffsetX = { -360, -240, -120, 0, 120, 240, 360 };
     private static float[] lineOffsetY = { -680, -510, -340, -170, 0, 170, 340, 510, 680 };
+    private static float[] rectOffsetX = {60, 180, 300, 420};
+    private static float[] rectOffsetY = {170, 510};
     private static Node[][] nodes;
     private static Node currentPositionNode;
     private static ArrayList<Node> neighbours = new ArrayList<>();
     private static ArrayList<Node> extendedList = new ArrayList<>();
+    private static Button btn_test;
 
 
 
@@ -101,7 +105,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Log.d("MyTag", "ok 1");
         options.inSampleSize = 3;// Adjust the sample size as needed
         Log.d("MyTag", "ok 2");
-        Bitmap helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
         largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Log.d("MyTag", "ok 3");
 
@@ -149,18 +153,10 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             }
         }
 
-        float[] rectOffsetX = {60, 180, 300, 420};
-        float[] rectOffsetY = {170, 510};
 
 
-        for(int i = 0; i < rectOffsetX.length; i++){
-            for(int j = 0; j < rectOffsetY.length; j++){
-                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
-            }
-        }
+
+        drawShop();
 
         nodes = new Node[lineOffsetX.length][lineOffsetY.length];
         for (int i = 0; i < lineOffsetY.length; i++) {
@@ -179,15 +175,36 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         routePlanner(nodes[1][1], nodes[6][5]);
 
         float currX = currentPosition.getX();
-        float currY = currentPosition.getY();
+        float currY = currentPosition.getY() + 725;
         currentPositionNode = new Node("current", currX, currY, 0, 0);
-        drawLine(currentPositionNode, nodes[1][1]);
-        closestNode(nodes[6][5]);
 
 
+        btn_test = findViewById(R.id.btn_test);
+        btn_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                largeBitmap.recycle();
+                largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                drawShop();
+                routePlanner(nodes[4][1], nodes[2][5]);
+            }
+        });
+
+        Log.d("MyTag", closestNode(nodes[6][5]).toString());
+        routePlanner( nodes[4][8],nodes[6][5]);
 
 
+    }
 
+    private static void drawShop() {
+        for(int i = 0; i < rectOffsetX.length; i++){
+            for(int j = 0; j < rectOffsetY.length; j++){
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
+            }
+        }
     }
 
     public static Node closestNode(Node goal){
@@ -208,12 +225,13 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
             }
         }
-        drawCircle(closestNode);
+        drawCircle(currentPositionNode);
+        Log.d("MyTag", "closest ok");
         return closestNode;
     }
 
     public static void routePlanner(Node start, Node goal) {
-        System.out.println("hello");
+        Log.d("MyTag", "routePlanner started");
 
         Node currentNode = new Node(start.getName(), start.getX(), start.getY(), start.getDistanceTravelled(),
                 start.getHeuristicDistance());
@@ -263,11 +281,11 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
             } else {
-                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
+                neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
-                System.out.println("beakadtam");
+                Log.d("MyTag", currentNode.toString());
             }
 
             nodeCopy(currentNode, previousNode);
@@ -295,6 +313,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             //drawCircle(currentNode);
             neighbours.clear();
         }
+        Log.d("MyTag", "routePlanner ended");
 
     }
 
@@ -327,7 +346,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         canvas.drawCircle(centerX, centerY, radius, paint);
     }
 
-    private void drawRectangle(float centerX, float centerY){
+    private static void drawRectangle(float centerX, float centerY){
         Canvas canvas = new Canvas(largeBitmap);
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
@@ -417,6 +436,9 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);// Set the cropped bitmap to the ImageView
             grid_map.setImageBitmap(visibleBitmap);// Your code here
 
+            currentPositionNode.setX(currentPositionNode.getX() + (float)Math.round(deltaX));
+            currentPositionNode.setY(currentPositionNode.getY() + (float)Math.round(deltaY));
+
             Log.d("MyTag", "OK");
         } catch (Exception e) {
             e.printStackTrace();
@@ -425,7 +447,12 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         }
 
 
-
+        //cleanMap();
+        closestNode(nodes[6][5]);
+        Log.d("MyTag", "before call");
+        //routePlanner(closestNode(nodes[6][5]), nodes[6][5]);
+        Log.d("MyTag", "after call");
+        //routePlanner(nodes[1][1], nodes[6][5]);
 
 
 
@@ -464,6 +491,12 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
     public static double distance(Node A, Node B) {
         return Math.sqrt(Math.pow((B.getX() - A.getX()), 2) + Math.pow((B.getY() - A.getY()), 2));
+    }
+
+    public static void cleanMap(){
+        largeBitmap.recycle();
+        largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        drawShop();
     }
 
     public static void changePosition(ImageView imageView, double deltaX, double deltaY){
