@@ -52,22 +52,22 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         tv_bag= findViewById(R.id.tv_bag);
 
         items = new ArrayList<>();
-        items.add(new Item("Tej", 300, R.drawable.tej, false));
-        items.add(new Item("Tej1", 300, R.drawable.tej, false));
-        items.add(new Item("Tej2", 300, R.drawable.tej, false));
-        items.add(new Item("Tej3", 300, R.drawable.tej, false));
-        items.add(new Item("Tej4", 300, R.drawable.tej, false));
-        items.add(new Item("Tej5", 300, R.drawable.tej, false));
-        items.add(new Item("Tej6", 300, R.drawable.tej, false));
-        items.add(new Item("Tej7", 300, R.drawable.tej, false));
-        items.add(new Item("Tej8", 300, R.drawable.tej, false));
-        items.add(new Item("Alma", 300, R.drawable.tej, false));
-        items.add(new Item("Korte", 300, R.drawable.tej, false));
-        items.add(new Item("Tej11", 300, R.drawable.tej, false));
-        items.add(new Item("Tej12", 300, R.drawable.tej, false));
-        items.add(new Item("Szilva", 300, R.drawable.tej, false));
-        items.add(new Item("Tej14", 300, R.drawable.tej, false));
-        items.add(new Item("Kenyer", 300, R.drawable.tej, false));
+        items.add(new Item("Tej", 300, R.drawable.tej, false, 0, 1));
+        items.add(new Item("Tej1", 300, R.drawable.tej, false, 0, 1));
+        items.add(new Item("Tej2", 300, R.drawable.tej, false, 0, 1));
+        items.add(new Item("Tej3", 300, R.drawable.tej, false, 1, 1));
+        items.add(new Item("Tej4", 300, R.drawable.tej, false, 1, 1));
+        items.add(new Item("Tej5", 300, R.drawable.tej, false, 1, 3));
+        items.add(new Item("Tej6", 300, R.drawable.tej, false, 6, 3));
+        items.add(new Item("Tej7", 300, R.drawable.tej, false, 2, 3));
+        items.add(new Item("Tej8", 300, R.drawable.tej, false, 2, 3));
+        items.add(new Item("Alma", 300, R.drawable.tej, false, 3, 5));
+        items.add(new Item("Korte", 300, R.drawable.tej, false, 3, 5));
+        items.add(new Item("Tej11", 300, R.drawable.tej, false, 3, 5));
+        items.add(new Item("Tej12", 300, R.drawable.tej, false, 4, 5));
+        items.add(new Item("Szilva", 300, R.drawable.tej, false, 4, 7));
+        items.add(new Item("Tej14", 300, R.drawable.tej, false, 4, 7));
+        items.add(new Item("Kenyer", 300, R.drawable.tej, false, 5, 7));
 
 
         myAdapter = new MyAdapter(getApplicationContext(), items, this);
