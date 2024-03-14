@@ -52,7 +52,7 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         tv_bag= findViewById(R.id.tv_bag);
 
         items = new ArrayList<>();
-        items.add(new Item("Tej", 300, R.drawable.tej, false, 0, 1));
+        items.add(new Item("Tej", 300, R.drawable.tej, false, 0, 8));
         items.add(new Item("Tej1", 300, R.drawable.tej, false, 0, 1));
         items.add(new Item("Tej2", 300, R.drawable.tej, false, 0, 1));
         items.add(new Item("Tej3", 300, R.drawable.tej, false, 1, 1));

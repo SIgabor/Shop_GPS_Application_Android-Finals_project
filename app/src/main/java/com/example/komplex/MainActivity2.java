@@ -177,8 +177,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         Log.d("MyTag", closestNode(nodes[6][5]).toString());
 
-        nodeCopy(nodes[6][3],currentPositionNode);
-        routePlanner(nodes[5][6]);
+        //nodeCopy(nodes[1][3],currentPositionNode);
+        routePlanner(nodes[6][0]);
 
 
 
