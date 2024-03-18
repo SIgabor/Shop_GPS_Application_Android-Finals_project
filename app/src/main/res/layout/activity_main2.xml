@@ -114,4 +114,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/baseline_north_24" />
 
+    <Button
+        android:id="@+id/btn_nextItem"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/istok_web_bold"
+        android:lineSpacingExtra="8sp"
+        android:text="Next Item"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

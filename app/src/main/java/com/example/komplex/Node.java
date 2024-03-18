@@ -23,13 +23,14 @@ public class Node {
                 + ", heuristicDistance=" + heuristicDistance + "]";
     }
 
-    public void copyNode(Node origin){
-        this.name = origin.getName();
-        this.x = origin.getX();
-        this.y = origin.getY();
-        this.distanceTravelled = origin.getDistanceTravelled();
-        this.heuristicDistance = origin.getHeuristicDistance();
+    public void copyNode(Node sourceNode) {
+        this.name = sourceNode.name;
+        this.x = sourceNode.x;
+        this.y = sourceNode.y;
+        this.distanceTravelled = sourceNode.distanceTravelled;
+        this.heuristicDistance = sourceNode.heuristicDistance;
     }
+
 
 
     public String getName() {

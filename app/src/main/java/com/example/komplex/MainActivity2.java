@@ -78,10 +78,12 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static Node[][] nodes;
     private static Node currentPositionNode;
     private static ArrayList<Node> neighbours = new ArrayList<>();
-    private static ArrayList<Node> extendedList = new ArrayList<>();
+    private static ArrayList<String> extendedList = new ArrayList<>();
     private static Button btn_test;
     private  static Node changeDetectionNode = new Node("", 0, 0, 0, 0);
     private static List<Item> bagItems;
+    private static List<Node> itemNodes;
+    private static Button btn_nextItem;
 
 
 
@@ -151,12 +153,19 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
 
+
         nodes = new Node[lineOffsetX.length][lineOffsetY.length];
         for (int i = 0; i < lineOffsetY.length; i++) {
             for (int j = 0; j < lineOffsetX.length; j++) {
                 nodes[j][i] = new Node("" + i + j, lineOffsetX[j], lineOffsetY[i], 0, 0);
 
             }
+        }
+
+        itemNodes = new ArrayList<>();
+        for (Item item: bagItems) {
+            itemNodes.add(nodes[item.getX()][item.getY()]);
+            //itemNodes.add(new Node(item.getName(), item.getX(), item.getY(), 0, 0));
         }
 
         drawShop();
@@ -173,12 +182,23 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         currentPositionNode = new Node("current", currX, currY, 0, 0);
 
 
+        btn_nextItem = findViewById(R.id.btn_nextItem);
+        btn_nextItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!itemNodes.isEmpty()){
+                    Log.d("MyTag", "üres1");
+                    itemNodes.remove(0);
+                    Log.d("MyTag", "üres2");
+                }
+            }
+        });
 
 
-        Log.d("MyTag", closestNode(nodes[6][5]).toString());
 
-        //nodeCopy(nodes[1][3],currentPositionNode);
-        routePlanner(nodes[6][0]);
+        //nodeCopy(nodes[6][3],currentPositionNode);
+        //routePlanner(nodes[5][7]);
+        //routePlanner2(nodes[6][3], nodes[5][7]);
 
 
 
@@ -213,17 +233,15 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         if(neighbours.size() == 4){
             neighbours.clear();
         }
-        Log.d("MyTag", "lista: " + neighbours.size());
 
         for(int i = 0; i < neighbours.size(); i++){
 
 
             if(distance(neighbours.get(i), goal) < distance(closestNode, goal)){
-                nodeCopy(neighbours.get(i), closestNode);
+                closestNode.copyNode(neighbours.get(i));
             }
         }
         drawCircle(currentPositionNode);
-        Log.d("MyTag", "closest ok");
         return closestNode;
     }
 
@@ -297,7 +315,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             } else if (indexes[1] % 2 != 0) {
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
-                Log.d("MyTag", currentNode.toString());
+                Log.d("MyTag", "csicska"+currentNode.toString());
 
             } else {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
@@ -307,8 +325,9 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 Log.d("MyTag", currentNode.toString());
             }
 
-            nodeCopy(currentNode, previousNode);
-            extendedList.add(currentNode);
+            previousNode.copyNode(currentNode);
+            extendedList.add(currentNode.getName());
+
 
             // set distance travelled
             for (int i = 0; i < neighbours.size(); i++) {
@@ -316,21 +335,24 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                         currentNode.getDistanceTravelled() + (float) distance(currentNode, neighbours.get(i)));
             }
 
-
             // choose best neighbour
             if (!isExtended(neighbours.get(0))) {
-                nodeCopy(neighbours.get(0), currentNode);
-                Log.d("MyTag", "extended: "+!isExtended(neighbours.get(0)));
+                currentNode.copyNode(neighbours.get(0));
+                Log.d("MyTag", "elakadtam 1");
             }
             for (int i = 1; i < neighbours.size(); i++) {
                 if (!isExtended(neighbours.get(i)) && (neighbours.get(i).getDistanceTravelled()
-                        + neighbours.get(i).getHeuristicDistance()) < (currentNode.getDistanceTravelled()
-                        + currentNode.getHeuristicDistance())) {
-                    nodeCopy(neighbours.get(i), currentNode);
-                    Log.d("MyTag", "extended: "+!isExtended(neighbours.get(i)));                }
+                        + neighbours.get(i).getHeuristicDistance()) <= (neighbours.get(0).getDistanceTravelled()
+                        + neighbours.get(0).getHeuristicDistance())) {
+                    currentNode.copyNode(neighbours.get(i));
+                    Log.d("MyTag", "elakadtam 2");
+
+                }
             }
             drawLine(previousNode, currentNode);
             //drawCircle(currentNode);
+            Log.d("MyTag", "current: " + currentNode.toString());
+
             neighbours.clear();
         }
 
@@ -343,7 +365,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     public static void drawItems(){
         for(int i = 0; i < bagItems.size(); i++){
             drawCircle(nodes[bagItems.get(i).getX()][bagItems.get(i).getY()]);
-            Log.d("MyTag", "bagitem " +bagItems.get(i).getName() +" " + bagItems.get(i).getX());
         }
     }
 
@@ -479,9 +500,14 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
         //closestNode(nodes[6][5]);
-        //cleanMap();
+        cleanMap();
         Log.d("MyTag", "before call");
-        //routePlanner(nodes[1][1]);
+        if(bagItems.isEmpty()){
+            Log.d("MyTag", "üres");
+        }
+        if(!bagItems.isEmpty()){
+            routePlanner(itemNodes.get(0));
+        }
 
 
 
@@ -492,17 +518,11 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
     }
 
-    public static void nodeCopy(Node from, Node to) {
-        to.setName(from.getName());
-        to.setX(from.getX());
-        to.setY(from.getY());
-        to.setDistanceTravelled(from.getDistanceTravelled());
-        to.setHeuristicDistance(from.getHeuristicDistance());
-    }
+
 
     public static boolean isExtended(Node A) {
         for (int i = 0; i < extendedList.size(); i++) {
-            if (A.getName().equalsIgnoreCase(extendedList.get(i).getName())) {
+            if (A.getName().equalsIgnoreCase(extendedList.get(i))) {
                 return true;
             }
         }
