@@ -10,14 +10,34 @@ public class Item implements Serializable {
     private int price;
     private int image;
     private boolean checked;
+    private int x;
+    private int y;
 
 
 
-    public Item(String name, int price, int image, boolean checked) {
+    public Item(String name, int price, int image, boolean checked, int x, int y) {
         this.name = name;
         this.price = price;
         this.image = image;
         this.checked = checked;
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public String getName() {
