@@ -108,7 +108,13 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Log.d("MyTag", "ok 1");
         options.inSampleSize = 3;// Adjust the sample size as needed
         Log.d("MyTag", "ok 2");
-        helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        try {
+            helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.d("MyTag", "catched at bitmap");
+        }
+
         largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Log.d("MyTag", "ok 3");
 
@@ -187,9 +193,12 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             @Override
             public void onClick(View view) {
                 if(!itemNodes.isEmpty()){
-                    Log.d("MyTag", "üres1");
-                    itemNodes.remove(0);
-                    Log.d("MyTag", "üres2");
+                    try{
+                        itemNodes.remove(0);
+                    }catch (Exception e){
+                        Log.d("MyTag", "cathed at button");
+                    }
+
                 }
             }
         });
@@ -241,7 +250,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 closestNode.copyNode(neighbours.get(i));
             }
         }
-        drawCircle(currentPositionNode);
+        //drawCircle(currentPositionNode);
         return closestNode;
     }
 
@@ -342,7 +351,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
             }
             for (int i = 1; i < neighbours.size(); i++) {
                 if (!isExtended(neighbours.get(i)) && (neighbours.get(i).getDistanceTravelled()
-                        + neighbours.get(i).getHeuristicDistance()) <= (neighbours.get(0).getDistanceTravelled()
+                        + neighbours.get(i).getHeuristicDistance()) < (neighbours.get(0).getDistanceTravelled()
                         + neighbours.get(0).getHeuristicDistance())) {
                     currentNode.copyNode(neighbours.get(i));
                     Log.d("MyTag", "elakadtam 2");
@@ -502,13 +511,20 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         //closestNode(nodes[6][5]);
         cleanMap();
         Log.d("MyTag", "before call");
-        if(bagItems.isEmpty()){
+
+        if(itemNodes.isEmpty()){
+            btn_nextItem.setVisibility(btn_nextItem.GONE);
             Log.d("MyTag", "üres");
         }
-        if(!bagItems.isEmpty()){
-            routePlanner(itemNodes.get(0));
-        }
+        if(!itemNodes.isEmpty()){
+            try{
+                routePlanner(itemNodes.get(0));
 
+            }catch (Exception e){
+                Log.d("MyTag", "catched in function");
+            }
+
+        }
 
 
         Log.d("MyTag", "after call");
