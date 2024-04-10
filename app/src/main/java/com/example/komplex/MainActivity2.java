@@ -175,7 +175,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         }
 
         drawShop();
-        drawItems();
+
 
         updateGPS();
         startLocationUpdates();
