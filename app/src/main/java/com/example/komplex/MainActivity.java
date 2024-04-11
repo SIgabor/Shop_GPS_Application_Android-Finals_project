@@ -14,6 +14,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Button button;
+    private Button btn_shopOne;
+    private Button btn_shopTwo;
+    private int desiredShop = -1;
 
 
 
@@ -30,6 +33,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btn_shopOne = findViewById(R.id.btn_shopOne);
+        btn_shopTwo = findViewById(R.id.btn_shopTwo);
+
+        btn_shopOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                desiredShop = 0;
+            }
+        });
+
+        btn_shopTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                desiredShop = 1;
+            }
+        });
+        
+
 
 
 
@@ -43,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void openActivity3() {
         Intent intent = new Intent(this, MainActivity3.class);
+        intent.putExtra("desiredShop", desiredShop);
         startActivity(intent);
+
         overridePendingTransition(R.anim.slide_from_top, R.anim.slide_to_bottom);
     }
 }

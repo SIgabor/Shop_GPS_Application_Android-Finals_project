@@ -84,6 +84,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static List<Item> bagItems;
     private static List<Node> itemNodes;
     private static Button btn_nextItem;
+    private int desiredShop = -1;
 
 
 
@@ -152,6 +153,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
         bagItems = (ArrayList<Item>) args.getSerializable("BAG_ITEMS");
 
+        desiredShop = recieverIntent.getIntExtra("desiredShop", -1);
+        Log.d("MyTag2", "intent recieved: " + desiredShop);
 
 
 

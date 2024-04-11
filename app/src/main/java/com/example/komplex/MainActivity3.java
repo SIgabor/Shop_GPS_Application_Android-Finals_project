@@ -21,6 +21,7 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
     private MyAdapter myAdapter;
     private List<Item> items;
     private List<Item> bagItems;
+    private int desiredShop = -1;
 
 
     @Override
@@ -74,6 +75,10 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myAdapter);
 
+        Intent intent = getIntent();
+        desiredShop = intent.getIntExtra("desiredShop", -1);
+        Log.d("MyTag", "intent recieved: " + desiredShop);
+
     }
 
     private void filterList(String text) {
@@ -99,6 +104,9 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         Bundle args = new Bundle();
         args.putSerializable("BAG_ITEMS", (Serializable) bagItems);
         senderIntent.putExtra("BUNDLE", args);
+
+        senderIntent.putExtra("desiredShop", desiredShop);
+
         startActivity(senderIntent);
 
         Log.d("MyTag", "onCreate: Intent sent");
