@@ -71,10 +71,10 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static int visibleHeight;
     private static int xOffset;
     private static int yOffset;
-    private static float[] lineOffsetX = { -360, -240, -120, 0, 120, 240, 360 };
-    private static float[] lineOffsetY = { -680, -510, -340, -170, 0, 170, 340, 510, 680 };
-    private static float[] rectOffsetX = {60, 180, 300, 420};
-    private static float[] rectOffsetY = {170, 510};
+    private static float[][] lineOffsetX = {{ -360, -240, -120, 0, 120, 240, 360 }, {-120, 0, 120}};
+    private static float[][] lineOffsetY = {{ -680, -510, -340, -170, 0, 170, 340, 510, 680 }, { -340, -170, 0, 170, 340}};
+    private static float[][] rectOffsetX = {{60, 180, 300, 420}, {60, 180}};
+    private static float[][] rectOffsetY = {{170, 510}, {170}};
     private static Node[][] nodes;
     private static Node currentPositionNode;
     private static ArrayList<Node> neighbours = new ArrayList<>();
@@ -84,7 +84,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static List<Item> bagItems;
     private static List<Node> itemNodes;
     private static Button btn_nextItem;
-    private int desiredShop = -1;
+    private static int desiredShop = -1;
 
 
 
@@ -128,6 +128,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         xOffset = largeBitmap.getWidth() / 2 - screenWidth / 2; // Adjust based on current screen position
         yOffset = largeBitmap.getHeight() / 2 - screenHeight / 2; // Adjust based on current screen position
 
+
+
         tv_lat = findViewById(R.id.tv_lat);
         tv_lon = findViewById(R.id.tv_lon);
 
@@ -156,17 +158,19 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         desiredShop = recieverIntent.getIntExtra("desiredShop", -1);
         Log.d("MyTag2", "intent recieved: " + desiredShop);
 
+        if(desiredShop == 1){
+            yOffset -= 350;;
+        }
 
 
 
 
 
 
-
-        nodes = new Node[lineOffsetX.length][lineOffsetY.length];
-        for (int i = 0; i < lineOffsetY.length; i++) {
-            for (int j = 0; j < lineOffsetX.length; j++) {
-                nodes[j][i] = new Node("" + i + j, lineOffsetX[j], lineOffsetY[i], 0, 0);
+        nodes = new Node[lineOffsetX[desiredShop].length][lineOffsetY[desiredShop].length];
+        for (int i = 0; i < lineOffsetY[desiredShop].length; i++) {
+            for (int j = 0; j < lineOffsetX[desiredShop].length; j++) {
+                nodes[j][i] = new Node("" + i + j, lineOffsetX[desiredShop][j], lineOffsetY[desiredShop][i], 0, 0);
 
             }
         }
@@ -188,6 +192,9 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         float currX = currentPosition.getX();
         float currY = currentPosition.getY() + 725;
+        if(desiredShop == 1){
+            currY -= 350;
+        }
         currentPositionNode = new Node("current", currX, currY, 0, 0);
 
 
@@ -219,12 +226,12 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     }
 
     private static void drawShop() {
-        for(int i = 0; i < rectOffsetX.length; i++){
-            for(int j = 0; j < rectOffsetY.length; j++){
-                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 - rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
-                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[i], largeBitmap.getHeight()/2 + rectOffsetY[j]);
+        for(int i = 0; i < rectOffsetX[desiredShop].length; i++){
+            for(int j = 0; j < rectOffsetY[desiredShop].length; j++){
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[desiredShop][i], largeBitmap.getHeight()/2 - rectOffsetY[desiredShop][j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[desiredShop][i], largeBitmap.getHeight()/2 - rectOffsetY[desiredShop][j]);
+                drawRectangle(largeBitmap.getWidth()/2 - rectOffsetX[desiredShop][i], largeBitmap.getHeight()/2 + rectOffsetY[desiredShop][j]);
+                drawRectangle(largeBitmap.getWidth()/2 + rectOffsetX[desiredShop][i], largeBitmap.getHeight()/2 + rectOffsetY[desiredShop][j]);
             }
         }
     }
@@ -233,8 +240,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         Node closestNode =new Node("closest", -screenHeight, -screenWidth,0, 0);
         ArrayList<Node> neighbours = new ArrayList<>();
 
-        for (int i = 0; i < lineOffsetY.length; i++) {
-            for (int j = 0; j < lineOffsetX.length; j++) {
+        for (int i = 0; i < lineOffsetY[desiredShop].length; i++) {
+            for (int j = 0; j < lineOffsetX[desiredShop].length; j++) {
                 if(distance(currentPositionNode, nodes[j][i]) <= 170 && i % 2 == 0){
                     neighbours.add(nodes[j][i]);
                     //drawCircle(nodes[j][i]);
@@ -270,8 +277,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         drawLine(currentPositionNode, start);
 
         // set heuristicDistance
-        for (int i = 0; i < lineOffsetY.length; i++) {
-            for (int j = 0; j < lineOffsetX.length; j++) {
+        for (int i = 0; i < lineOffsetY[desiredShop].length; i++) {
+            for (int j = 0; j < lineOffsetX[desiredShop].length; j++) {
                 nodes[j][i].setHeuristicDistance((float) distance(nodes[j][i], goal));
             }
         }
@@ -285,17 +292,17 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 Log.d("MyTag", currentNode.toString());
 
-            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] == 0) {
+            } else if (indexes[0] == lineOffsetX[desiredShop].length - 1 && indexes[1] == 0) {
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 Log.d("MyTag", currentNode.toString());
 
-            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] == lineOffsetY.length - 1) {
+            } else if (indexes[0] == lineOffsetX[desiredShop].length - 1 && indexes[1] == lineOffsetY[desiredShop].length - 1) {
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 Log.d("MyTag", currentNode.toString());
 
-            } else if (indexes[0] == 0 && indexes[1] == lineOffsetY.length - 1) {
+            } else if (indexes[0] == 0 && indexes[1] == lineOffsetY[desiredShop].length - 1) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 Log.d("MyTag", currentNode.toString());
@@ -306,13 +313,13 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 Log.d("MyTag", currentNode.toString());
 
-            } else if (indexes[0] == lineOffsetX.length - 1 && indexes[1] % 2 == 0) {
+            } else if (indexes[0] == lineOffsetX[desiredShop].length - 1 && indexes[1] % 2 == 0) {
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 Log.d("MyTag", currentNode.toString());
 
-            } else if (indexes[1] == lineOffsetY.length-1) {
+            } else if (indexes[1] == lineOffsetY[desiredShop].length-1) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
@@ -491,6 +498,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         tv_deltaY.setText(String.valueOf(deltaY));
         tv_deltaX.setText(String.valueOf(deltaX));
 
+
         try {
             xOffset +=(int)Math.round(deltaX);
             yOffset +=(int)Math.round(deltaY);
@@ -513,6 +521,9 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         //closestNode(nodes[6][5]);
         cleanMap();
+
+        drawCircle(currentPositionNode);
+
         Log.d("MyTag", "before call");
 
         if(itemNodes.isEmpty()){
@@ -550,8 +561,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
     public static int[] getIndex(Node A) {
         int[] indexes = new int[2];
-        for (int i = 0; i < lineOffsetY.length; i++) {
-            for (int j = 0; j < lineOffsetX.length; j++) {
+        for (int i = 0; i < lineOffsetY[desiredShop].length; i++) {
+            for (int j = 0; j < lineOffsetX[desiredShop].length; j++) {
                 if (nodes[j][i].getName().equalsIgnoreCase(A.getName())) {
                     indexes[0] = j;
                     indexes[1] = i;

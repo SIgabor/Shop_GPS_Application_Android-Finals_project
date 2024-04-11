@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         button = findViewById(R.id.btn_toActivity2);
+        button.setEnabled(false);
+        button.setAlpha(0.3f);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 desiredShop = 0;
+                button.setEnabled(true);
+                button.setAlpha(1f);
             }
         });
 
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 desiredShop = 1;
+                button.setEnabled(true);
+                button.setAlpha(1f);
             }
         });
         
