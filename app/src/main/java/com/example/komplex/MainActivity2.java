@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +86,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     private static List<Node> itemNodes;
     private static Button btn_nextItem;
     private static int desiredShop = -1;
+    private static ProgressBar progressBar;
 
 
 
@@ -99,11 +101,9 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
 
-
+        progressBar = findViewById(R.id.progressBar);
         grid_map = findViewById(R.id.grid_map);
-        tv_deltaY = findViewById(R.id.tv_deltaY);
-        tv_deltaX = findViewById(R.id.tv_deltaX);
-        tv_heading = findViewById(R.id.tv_heading);
+
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         Log.d("MyTag", "ok 1");
@@ -130,8 +130,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
 
 
-        tv_lat = findViewById(R.id.tv_lat);
-        tv_lon = findViewById(R.id.tv_lon);
+
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
@@ -147,7 +146,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         };
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        arrowToNorth = findViewById(R.id.iv_arrowToNorth);
         currentPosition = findViewById(R.id.iv_currentPosition);
 
 
@@ -197,6 +195,8 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         }
         currentPositionNode = new Node("current", currX, currY, 0, 0);
 
+        progressBar.setMax(itemNodes.size());
+        progressBar.setProgress(0);
 
         btn_nextItem = findViewById(R.id.btn_nextItem);
         btn_nextItem.setOnClickListener(new View.OnClickListener() {
@@ -205,10 +205,14 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
                 if(!itemNodes.isEmpty()){
                     try{
                         itemNodes.remove(0);
+                        progressBar.setProgress(progressBar.getProgress() + 1);
                     }catch (Exception e){
                         Log.d("MyTag", "cathed at button");
                     }
 
+                }
+                else{
+                    progressBar.setProgress(progressBar.getMax());
                 }
             }
         });
@@ -476,8 +480,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     }
 
     private void updateUIValues(Location location) {
-        tv_lat.setText(String.valueOf(location.getLatitude()));// = y
-        tv_lon.setText(String.valueOf(location.getLongitude()));// = x
+
 
         if(defaultX  == 0 && defaultY == 0){
             defaultX = -(int)Math.round(location.getLongitude() * GPS_PRECISION);
@@ -495,8 +498,7 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
 
         defaultX = currentX;
         defaultY = currentY;
-        tv_deltaY.setText(String.valueOf(deltaY));
-        tv_deltaX.setText(String.valueOf(deltaX));
+
 
 
         try {
@@ -608,8 +610,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         degree = Math.round(sensorEvent.values[0]);
-        tv_heading.setText("Heading: " + degree);
-        arrowToNorth.setRotation(-degree);
         currentPosition.setRotation(-degree);
     }
 

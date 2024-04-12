@@ -52,32 +52,54 @@ public class MainActivity3 extends AppCompatActivity implements SelectListener{
         bagItems = new ArrayList<>();
         tv_bag= findViewById(R.id.tv_bag);
 
+        Intent intent = getIntent();
+        desiredShop = intent.getIntExtra("desiredShop", -1);
+        Log.d("MyTag", "intent recieved: " + desiredShop);
+
         items = new ArrayList<>();
-        items.add(new Item("Tej", 300, R.drawable.tej, false, 0, 8));
-        items.add(new Item("Tej1", 300, R.drawable.tej, false, 0, 1));
-        items.add(new Item("Tej2", 300, R.drawable.tej, false, 0, 1));
-        items.add(new Item("Tej3", 300, R.drawable.tej, false, 1, 1));
-        items.add(new Item("Tej4", 300, R.drawable.tej, false, 1, 1));
-        items.add(new Item("Tej5", 300, R.drawable.tej, false, 1, 3));
-        items.add(new Item("Tej6", 300, R.drawable.tej, false, 6, 3));
-        items.add(new Item("Tej7", 300, R.drawable.tej, false, 2, 3));
-        items.add(new Item("Tej8", 300, R.drawable.tej, false, 2, 3));
-        items.add(new Item("Alma", 300, R.drawable.tej, false, 3, 5));
-        items.add(new Item("Korte", 300, R.drawable.tej, false, 3, 5));
-        items.add(new Item("Tej11", 300, R.drawable.tej, false, 3, 5));
-        items.add(new Item("Tej12", 300, R.drawable.tej, false, 4, 5));
-        items.add(new Item("Szilva", 300, R.drawable.tej, false, 4, 7));
-        items.add(new Item("Tej14", 300, R.drawable.tej, false, 4, 7));
-        items.add(new Item("Kenyer", 300, R.drawable.tej, false, 5, 7));
+
+        switch (desiredShop){
+            case 0:
+                items.add(new Item("Cappy", 300, R.drawable.cappy, false, 0, 8));
+                items.add(new Item("Corona Sör", 300, R.drawable.corona, false, 0, 1));
+                items.add(new Item("Csirkemell", 300, R.drawable.csirkemell, false, 0, 1));
+                items.add(new Item("Fokhagymás Chips", 300, R.drawable.fokhagymaschips, false, 1, 1));
+                items.add(new Item("Hazai Vaj", 300, R.drawable.hazaivaj, false, 1, 1));
+                items.add(new Item("HeyHo", 300, R.drawable.heyho, false, 1, 3));
+                items.add(new Item("Paprikás Chips", 300, R.drawable.paprikschips, false, 6, 3));
+                items.add(new Item("Pecsi Sör", 300, R.drawable.pecsisor, false, 2, 3));
+                items.add(new Item("Pilsner Sör", 300, R.drawable.pilsner, false, 2, 3));
+                items.add(new Item("Alma", 300, R.drawable.alma, false, 3, 5));
+                items.add(new Item("Korte", 300, R.drawable.korte, false, 3, 5));
+                items.add(new Item("Ropi", 300, R.drawable.ropi, false, 3, 5));
+                items.add(new Item("Sajt", 300, R.drawable.sajt, false, 4, 5));
+                items.add(new Item("Szilva", 300, R.drawable.szilva, false, 4, 7));
+                items.add(new Item("Sajtos Chips", 300, R.drawable.sajtoschips, false, 4, 7));
+                items.add(new Item("Kenyer", 300, R.drawable.kenyer, false, 5, 7));
+                items.add(new Item("Saláta", 300, R.drawable.salata, false, 5, 7));
+                items.add(new Item("Soproni Sör", 300, R.drawable.soproni, false, 5, 7));
+                items.add(new Item("Sós Chips", 300, R.drawable.soschips, false, 5, 7));
+                items.add(new Item("Venusz Light Vaj", 300, R.drawable.venusz_light_vaj, false, 5, 7));
+
+                break;
+            case 1:
+                items.add(new Item("Cappy", 300, R.drawable.cappy, false, 0, 1));
+                items.add(new Item("Corona Sör", 300, R.drawable.corona, false, 1, 1));
+                items.add(new Item("Csirkemell", 300, R.drawable.csirkemell, false, 2, 3));
+                items.add(new Item("Fokhagymás Chips", 300, R.drawable.fokhagymaschips, false, 2, 2));
+                items.add(new Item("Hazai Vaj", 300, R.drawable.hazaivaj, false, 2, 4));
+                items.add(new Item("HeyHo", 300, R.drawable.heyho, false, 1, 3));
+                break;
+        }
+
+
 
 
         myAdapter = new MyAdapter(getApplicationContext(), items, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myAdapter);
 
-        Intent intent = getIntent();
-        desiredShop = intent.getIntExtra("desiredShop", -1);
-        Log.d("MyTag", "intent recieved: " + desiredShop);
+
 
     }
 
