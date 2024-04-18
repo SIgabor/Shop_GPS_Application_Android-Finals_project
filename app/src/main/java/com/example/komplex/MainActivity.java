@@ -19,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     private int desiredShop = -1;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,18 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 button.setAlpha(1f);
             }
         });
-        
-
-
-
 
     }
-
-    /*private void openActivity2() {
-        Intent intent = new Intent(this, MainActivity2.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_from_rigth, R.anim.slide_to_left);
-    }*/
 
     private void openActivity3() {
         Intent intent = new Intent(this, MainActivity3.class);

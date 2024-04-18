@@ -524,7 +524,6 @@ public class MainActivity2 extends AppCompatActivity implements SensorEventListe
         //closestNode(nodes[6][5]);
         cleanMap();
 
-        drawCircle(currentPositionNode);
 
         Log.d("MyTag", "before call");
 
