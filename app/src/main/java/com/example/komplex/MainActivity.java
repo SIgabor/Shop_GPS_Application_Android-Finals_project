@@ -1,11 +1,16 @@
 package com.example.komplex;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Button button;
@@ -20,18 +25,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         button = findViewById(R.id.btn_toActivity2);
-        btn_shopOne = findViewById(R.id.btn_shopOne);
-        btn_shopTwo = findViewById(R.id.btn_shopTwo);
-
         button.setEnabled(false);
         button.setAlpha(0.3f);
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openActivity2();
+                openActivity3();
             }
         });
+
+        btn_shopOne = findViewById(R.id.btn_shopOne);
+        btn_shopTwo = findViewById(R.id.btn_shopTwo);
 
         btn_shopOne.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void openActivity2() {
-        Intent intent = new Intent(this, MainActivity2.class);
+    private void openActivity3() {
+        Intent intent = new Intent(this, MainActivity3.class);
         intent.putExtra("desiredShop", desiredShop);
         startActivity(intent);
 

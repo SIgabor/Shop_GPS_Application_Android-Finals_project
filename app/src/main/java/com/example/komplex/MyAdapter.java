@@ -46,7 +46,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         Collections.sort(items, new CustomComparator().reversed());
         Log.d("MyTag", "onBindViewHolder");
         holder.nameView.setText(items.get(position).getName());
-        holder.priceView.setText(items.get(position).getPrice() + " Ft");
+        holder.priceView.setText(items.get(position).getPrice());
         holder.imageview.setImageResource(items.get(position).getImage());
 
         if(items.get(position).getChecked()){
