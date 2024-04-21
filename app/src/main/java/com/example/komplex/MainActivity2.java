@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,13 +20,15 @@ public class MainActivity2 extends AppCompatActivity implements SelectListener{
     private MyAdapter myAdapter;
     private List<Item> items;
     private List<Item> bagItems;
-    private int desiredShop = -1;
+    private int desiredShop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main3);
+        setContentView(R.layout.activity_main2);
 
+        tv_bag= findViewById(R.id.tv_bag);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         SearchView searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -43,9 +44,7 @@ public class MainActivity2 extends AppCompatActivity implements SelectListener{
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        bagItems = new ArrayList<>();
-        tv_bag= findViewById(R.id.tv_bag);
+
 
         Intent intent = getIntent();
         desiredShop = intent.getIntExtra("desiredShop", -1);
@@ -80,7 +79,7 @@ public class MainActivity2 extends AppCompatActivity implements SelectListener{
                 items.add(new Item("Corona Sör", 700, R.drawable.corona, false, 1, 1));
                 items.add(new Item("Csirkemell", 1000, R.drawable.csirkemell, false, 2, 3));
                 items.add(new Item("Fokhagymás Chips", 890, R.drawable.fokhagymaschips, false, 2, 2));
-                items.add(new Item("Hazai Vaj", 400, R.drawable.hazaivaj, false, 2, 4));
+                items.add(new Item("Hazai Vaj", 400, R.drawable.hazaivaj, false, 3, 3));
                 items.add(new Item("HeyHo", 500, R.drawable.heyho, false, 1, 3));
                 break;
         }
@@ -88,6 +87,8 @@ public class MainActivity2 extends AppCompatActivity implements SelectListener{
         myAdapter = new MyAdapter(getApplicationContext(), items, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myAdapter);
+
+        bagItems = new ArrayList<>();
     }
 
     private void filterList(String text) {
@@ -106,6 +107,8 @@ public class MainActivity2 extends AppCompatActivity implements SelectListener{
 
     @Override
     public void onBackPressed(){
+        super.onBackPressed();
+
         Intent senderIntent = new Intent(this, MainActivity3.class);
         Bundle args = new Bundle();
         args.putSerializable("BAG_ITEMS", (Serializable) bagItems);

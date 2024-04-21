@@ -91,12 +91,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     public void setFilteredList(List<Item> filteredList){
         this.items = filteredList;
-        Log.d("MyTag", "setFilteredList items changed");
         notifyDataSetChanged();
-        Log.d("MyTag", "adapter notified");
     }
-
-
-
-
 }
