@@ -35,8 +35,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity3 extends AppCompatActivity implements SensorEventListener {
@@ -134,8 +132,6 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
         for (Item item: bagItems) {
             itemNodes.add(nodes[item.getX()][item.getY()]);
         }
-
-        Collections.sort(itemNodes, new DistanceComparator());
 
         currentPosition = findViewById(R.id.iv_currentPosition);
 
@@ -510,12 +506,4 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
-
-    public class DistanceComparator implements Comparator<Node> {
-        @Override
-        public int compare(Node o1, Node o2) {
-            return Double.compare(distance(o1, currentPositionNode), distance(o2, currentPositionNode));
-        }
-    }
-
 }
