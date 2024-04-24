@@ -9,7 +9,7 @@
     android:id="@+id/constraintLayout">
 
     <ImageView
-        android:id="@+id/grid_map"
+        android:id="@+id/iv_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -55,6 +55,6 @@
         android:progress="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/grid_map" />
+        app:layout_constraintTop_toTopOf="@+id/iv_map" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

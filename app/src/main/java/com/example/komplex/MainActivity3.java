@@ -20,7 +20,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -43,13 +42,14 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
     public static final int DEFAULT_UPDATE_INTERVAL = 1;
     public static final int FAST_UPDATE_INTERVAL = 1;
     private static final int PERMISSIONS_FINE_LOCATION = 99; //!!!DO NOT CHANGE!!!
-    public static final int GPS_PRECISION = 1000000/2;
+    public static final int GPS_PRECISION = 1000000;
     public static final int RECT_LR_SIZE = 25;
     public static final int RECT_TB_SIZE = 125;
     private static final float[][] LINE_OFFSET_X = {{ -360, -240, -120, 0, 120, 240, 360 }, {-120, 0, 120}};
     private static final float[][] LINE_OFFSET_Y = {{ -680, -510, -340, -170, 0, 170, 340, 510, 680 }, { -340, -170, 0, 170, 340}};
     private static final float[][] RECT_OFFSET_X = {{60, 180, 300, 420}, {60, 180}};
     private static final float[][] RECT_OFFSET_Y = {{170, 510}, {170}};
+    private static final int CENTER_OFFSET = 350;
     private static LocationRequest locationRequest;
     private static LocationCallback locationCallBack;
     private static FusedLocationProviderClient fusedLocationProviderClient;
@@ -58,7 +58,7 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
     private static double defaultY = 0;
     private static int xOffset;
     private static int yOffset;
-    private static ImageView grid_map;
+    private static ImageView iv_map;
     private static ImageView currentPosition;
     private static Bitmap largeBitmap;
     private static Bitmap helperBitmap;
@@ -83,41 +83,23 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
-
-
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        grid_map = findViewById(R.id.grid_map);
-
+        iv_map = findViewById(R.id.iv_map);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
-        Log.d("MyTag", "ok 1");
-        options.inSampleSize = 3;// Adjust the sample size as needed
-        Log.d("MyTag", "ok 2");
+        options.inSampleSize = 4;
         try {
             helperBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grid_map, options);
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("MyTag", "catched at bitmap");
         }
-
         largeBitmap = helperBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Log.d("MyTag", "ok 3");
 
-
-// Calculate visible portion based on screen dimensions and position
         screenWidth = getResources().getDisplayMetrics().widthPixels;
         screenHeight = getResources().getDisplayMetrics().heightPixels;
-        visibleWidth = screenWidth;  // Adjust as needed
-        visibleHeight = screenHeight;// Adjust as needed
-        xOffset = largeBitmap.getWidth() / 2 - screenWidth / 2; // Adjust based on current screen position
-        yOffset = largeBitmap.getHeight() / 2 - screenHeight / 2; // Adjust based on current screen position
-
-
-
-
+        visibleWidth = screenWidth;
+        visibleHeight = screenHeight;
+        xOffset = largeBitmap.getWidth() / 2 - screenWidth / 2;
+        yOffset = largeBitmap.getHeight() / 2 - screenHeight / 2;
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000 * DEFAULT_UPDATE_INTERVAL);
@@ -132,25 +114,11 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
             }
         };
 
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        currentPosition = findViewById(R.id.iv_currentPosition);
-
-
         Intent recieverIntent = getIntent();
         Bundle args = recieverIntent.getBundleExtra("BUNDLE");
         bagItems = (ArrayList<Item>) args.getSerializable("BAG_ITEMS");
 
         desiredShop = recieverIntent.getIntExtra("desiredShop", -1);
-        Log.d("MyTag2", "intent recieved: " + desiredShop);
-
-        if(desiredShop == 1){
-            yOffset -= 350;;
-        }
-
-
-
-
-
 
         nodes = new Node[LINE_OFFSET_X[desiredShop].length][LINE_OFFSET_Y[desiredShop].length];
         for (int i = 0; i < LINE_OFFSET_Y[desiredShop].length; i++) {
@@ -163,25 +131,19 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
         itemNodes = new ArrayList<>();
         for (Item item: bagItems) {
             itemNodes.add(nodes[item.getX()][item.getY()]);
-            //itemNodes.add(new Node(item.getName(), item.getX(), item.getY(), 0, 0));
         }
 
-        drawShop();
-
-
-        updateGPS();
-        startLocationUpdates();
-        //drawCircles(largeBitmap, largeBitmap.getWidth() / 2, largeBitmap.getHeight() / 2 - 800);
-        //drawRectangle(largeBitmap.getWidth()/2 - 60 - 130, largeBitmap.getHeight()/2 - 170 - 280);
-        //drawLine(nodes[0][0], nodes[6][3]);
+        currentPosition = findViewById(R.id.iv_currentPosition);
 
         float currX = currentPosition.getX();
         float currY = currentPosition.getY() + 725;
         if(desiredShop == 1){
-            currY -= 350;
+            currY -= CENTER_OFFSET;
+            yOffset -= CENTER_OFFSET;
         }
         currentPositionNode = new Node("current", currX, currY, 0, 0);
 
+        ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setMax(itemNodes.size());
         progressBar.setProgress(0);
 
@@ -204,15 +166,12 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
             }
         });
 
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
+        drawShop();
 
-        //nodeCopy(nodes[6][3],currentPositionNode);
-        //routePlanner(nodes[5][7]);
-        //routePlanner2(nodes[6][3], nodes[5][7]);
-
-
-
-
+        updateGPS();
+        startLocationUpdates();
 
     }
 
@@ -235,28 +194,20 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
             for (int j = 0; j < LINE_OFFSET_X[desiredShop].length; j++) {
                 if(distance(currentPositionNode, nodes[j][i]) <= 170 && i % 2 == 0){
                     neighbours.add(nodes[j][i]);
-                    //drawCircle(nodes[j][i]);
                 }
             }
         }
 
-        if(neighbours.size() == 4){
-            neighbours.clear();
-        }
-
         for(int i = 0; i < neighbours.size(); i++){
-
-
             if(distance(neighbours.get(i), goal) < distance(closestNode, goal)){
                 closestNode.copyNode(neighbours.get(i));
             }
         }
-        //drawCircle(currentPositionNode);
+
         return closestNode;
     }
 
     private static void routePlanner(Node goal) {
-        Log.d("MyTag", "routePlanner started");
         Node start = new Node("", 0, 0, 0, 0);
         start.copyNode(closestNode(goal));
 
@@ -276,7 +227,6 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
 
         ArrayList<Node> neighbours = new ArrayList<>();
 
-
         while (!currentNode.getName().equals(goal.getName())) {
             int[] indexes = getIndex(currentNode);
 
@@ -284,63 +234,52 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
             if (indexes[0] == 0 && indexes[1] == 0) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[0] == LINE_OFFSET_X[desiredShop].length - 1 && indexes[1] == 0) {
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[0] == LINE_OFFSET_X[desiredShop].length - 1 && indexes[1] == LINE_OFFSET_Y[desiredShop].length - 1) {
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[0] == 0 && indexes[1] == LINE_OFFSET_Y[desiredShop].length - 1) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[1] == 0) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[0] == LINE_OFFSET_X[desiredShop].length - 1 && indexes[1] % 2 == 0) {
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[1] == LINE_OFFSET_Y[desiredShop].length-1) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[0] == 0 && indexes[1] % 2 == 0) {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
-                Log.d("MyTag", currentNode.toString());
 
             } else if (indexes[1] % 2 != 0) {
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
-                Log.d("MyTag", "csicska"+currentNode.toString());
 
             } else {
                 neighbours.add(nodes[indexes[0] + 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0] - 1][indexes[1]]);
                 neighbours.add(nodes[indexes[0]][indexes[1] + 1]);
                 neighbours.add(nodes[indexes[0]][indexes[1] - 1]);
-                Log.d("MyTag", currentNode.toString());
             }
 
             previousNode.copyNode(currentNode);
             extendedList.add(currentNode.getName());
-
 
             // set distance travelled
             for (int i = 0; i < neighbours.size(); i++) {
@@ -351,27 +290,18 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
             // choose best neighbour
             if (!isExtended(neighbours.get(0))) {
                 currentNode.copyNode(neighbours.get(0));
-                Log.d("MyTag", "elakadtam 1");
             }
             for (int i = 1; i < neighbours.size(); i++) {
                 if (!isExtended(neighbours.get(i)) && (neighbours.get(i).getDistanceTravelled()
                         + neighbours.get(i).getHeuristicDistance()) < (neighbours.get(0).getDistanceTravelled()
                         + neighbours.get(0).getHeuristicDistance())) {
                     currentNode.copyNode(neighbours.get(i));
-                    Log.d("MyTag", "elakadtam 2");
-
                 }
             }
             drawLine(previousNode, currentNode);
-            //drawCircle(currentNode);
-            Log.d("MyTag", "current: " + currentNode.toString());
-
             neighbours.clear();
         }
-
         extendedList.clear();
-        Log.d("MyTag", "routePlanner ended");
-
 
     }
 
@@ -428,13 +358,11 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallBack, Looper.getMainLooper());
             updateGPS();
-            //ha beszarna akkor csak a felső 2 sor kell, az ifek nem
         }else{
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_FINE_LOCATION);
             }
         }
-        Log.d("MyTag", "Location is being tracked");
     }
 
     @Override
@@ -471,7 +399,6 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
 
     private void updateUIValues(Location location) {
 
-
         if(defaultX  == 0 && defaultY == 0){
             defaultX = -(int)Math.round(location.getLongitude() * GPS_PRECISION);
             defaultY = -(int)Math.round(location.getLatitude() * GPS_PRECISION);
@@ -483,60 +410,33 @@ public class MainActivity3 extends AppCompatActivity implements SensorEventListe
         double deltaX = (defaultX - currentX);
         double deltaY = -(defaultY - currentY);
 
-        //changePosition(grid_map, deltaX, deltaY);
-        //changePosition(locationMarker, deltaX, deltaY);
-
         defaultX = currentX;
         defaultY = currentY;
-
-
 
         try {
             xOffset +=(int)Math.round(deltaX);
             yOffset +=(int)Math.round(deltaY);
-            Log.d("MyTag", String.valueOf(yOffset));
-            Log.d("MyTag", String.valueOf(largeBitmap.getHeight()));
-            Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);// Set the cropped bitmap to the ImageView
-            grid_map.setImageBitmap(visibleBitmap);// Your code here
-
+            Bitmap visibleBitmap = Bitmap.createBitmap(largeBitmap, xOffset, yOffset, visibleWidth, visibleHeight);
+            iv_map.setImageBitmap(visibleBitmap);
             currentPositionNode.setX(currentPositionNode.getX() + (float)Math.round(deltaX));
             currentPositionNode.setY(currentPositionNode.getY() + (float)Math.round(deltaY));
-
-            Log.d("MyTag", "OK");
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("MyTag", "catched");// Log the exception
             Toast.makeText(this, "Bolt területe elhagyva!" , Toast.LENGTH_SHORT).show();
         }
 
-
-
-        //closestNode(nodes[6][5]);
         cleanMap();
-
-
-        Log.d("MyTag", "before call");
 
         if(itemNodes.isEmpty()){
             btn_nextItem.setVisibility(btn_nextItem.GONE);
-            Log.d("MyTag", "üres");
-        }
-        if(!itemNodes.isEmpty()){
+        }else{
             try{
                 routePlanner(itemNodes.get(0));
 
             }catch (Exception e){
-                Log.d("MyTag", "catched in function");
+                e.printStackTrace();
             }
-
         }
-
-
-        Log.d("MyTag", "after call");
-        //routePlanner(nodes[1][1], nodes[6][5]);
-
-
-
     }
 
 
